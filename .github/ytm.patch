@@ -1,0 +1,26 @@
+set -e
+rm -f .github/ytm.patch
+mkdir -p .github/workflows
+rm -f .github/workflows/flutter.yml
+cat > .github/workflows/build-apk.yml <<'YMLEOF'
+{"name":"Build APK","on":"workflow_dispatch","jobs":{"build":{"runs-on":"ubuntu-latest","steps":[{"uses":"actions/checkout@v4"},{"uses":"actions/setup-java@v4","with":{"distribution":"temurin","java-version":"17"}},{"uses":"subosito/flutter-action@v2","with":{"flutter-version":"3.27.1","channel":"stable","cache":true}},{"run":"flutter pub get"},{"run":"flutter build apk --release --split-per-abi"},{"uses":"actions/upload-artifact@v4","with":{"name":"apks","path":"build/app/outputs/flutter-apk/*.apk"}}]}}}
+YMLEOF
+python3 - <<'PYEOF'
+import re
+p = 'lib/Screens/Home/home.dart'
+s = open(p).read()
+s = s.replace('Icons.trending_up_rounded', 'Icons.favorite_rounded')
+s = s.replace('AppLocalizations.of(context)!.topCharts', 'AppLocalizations.of(context)!.favSongs')
+s = s.replace('const Icon(MdiIcons.youtube)', 'const Icon(Icons.playlist_play_rounded)')
+s = s.replace('AppLocalizations.of(context)!.youTube', 'AppLocalizations.of(context)!.playlists')
+s, n1 = re.subn(r"TopCharts\(\s*pageController: _pageController,\s*\)", "LikedSongs(playlistName: 'Favorite Songs', showName: AppLocalizations.of(context)!.favSongs)", s)
+s, n2 = re.subn(r"const YouTube\(\)", "PlaylistScreen()", s)
+print('screens replaced:', n1, n2)
+assert n1 == 1 and n2 == 1, 'pattern not found, nothing written'
+s = "import 'package:blackhole/Screens/Library/liked.dart';\nimport 'package:blackhole/Screens/Library/playlists.dart';\n" + s
+open(p, 'w').write(s)
+PYEOF
+rm -f .github/x.sh
+git add -A
+git commit -q -m "Replace Top Charts and YouTube tabs with Favorites and Playlists" && echo COMMITTED
+echo DONE
