@@ -1,3 +1,5 @@
+import 'package:blackhole/Screens/Library/liked.dart';
+import 'package:blackhole/Screens/Library/playlists.dart';
 /*
  *  This file is part of BlackHole (https://github.com/BrightDV/BlackHole).
  * 
@@ -562,15 +564,15 @@ class _HomePageState extends State<HomePage> {
                           );
                         case 'Top Charts':
                           return NavigationRailDestination(
-                            icon: const Icon(Icons.trending_up_rounded),
+                            icon: const Icon(Icons.favorite_rounded),
                             label: Text(
-                              AppLocalizations.of(context)!.topCharts,
+                              AppLocalizations.of(context)!.favSongs,
                             ),
                           );
                         case 'YouTube':
                           return NavigationRailDestination(
-                            icon: const Icon(MdiIcons.youtube),
-                            label: Text(AppLocalizations.of(context)!.youTube),
+                            icon: const Icon(Icons.playlist_play_rounded),
+                            label: Text(AppLocalizations.of(context)!.playlists),
                           );
                         case 'Library':
                           return NavigationRailDestination(
@@ -667,9 +669,7 @@ class _HomePageState extends State<HomePage> {
                             return HandleRoute.handleRoute(settings.name);
                           },
                         ),
-                        screen: TopCharts(
-                          pageController: _pageController,
-                        ),
+                        screen: LikedSongs(playlistName: 'Favorite Songs', showName: AppLocalizations.of(context)!.favSongs),
                       );
                     case 'YouTube':
                       return CustomNavBarScreen(
@@ -685,7 +685,7 @@ class _HomePageState extends State<HomePage> {
                             return HandleRoute.handleRoute(settings.name);
                           },
                         ),
-                        screen: const YouTube(),
+                        screen: PlaylistScreen(),
                       );
                     case 'Library':
                       return CustomNavBarScreen(
@@ -740,14 +740,14 @@ class _HomePageState extends State<HomePage> {
           );
         case 'Top Charts':
           return CustomBottomNavBarItem(
-            icon: const Icon(Icons.trending_up_rounded),
-            title: Text(AppLocalizations.of(context)!.topCharts),
+            icon: const Icon(Icons.favorite_rounded),
+            title: Text(AppLocalizations.of(context)!.favSongs),
             selectedColor: Theme.of(context).colorScheme.secondary,
           );
         case 'YouTube':
           return CustomBottomNavBarItem(
-            icon: const Icon(MdiIcons.youtube),
-            title: Text(AppLocalizations.of(context)!.youTube),
+            icon: const Icon(Icons.playlist_play_rounded),
+            title: Text(AppLocalizations.of(context)!.playlists),
             selectedColor: Theme.of(context).colorScheme.secondary,
           );
         case 'Library':
