@@ -1,3 +1,4 @@
+import 'package:blackhole/CustomWidgets/instagram_tile.dart';
 /*
  *  This file is part of BlackHole (https://github.com/BrightDV/BlackHole).
  * 
@@ -317,8 +318,9 @@ class _NewSettingsPageState extends State<NewSettingsPage>
             vertical: 15.0,
           ),
           physics: const BouncingScrollPhysics(),
-          itemCount: settingsList.length,
+          itemCount: settingsList.length + 1,
           itemBuilder: (context, index) {
+if (index == settingsList.length) return const InstagramTile();
             return ListTile(
               leading: SizedBox.square(
                 dimension: 40,

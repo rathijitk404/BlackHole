@@ -691,7 +691,6 @@ class _SearchPageState extends State<SearchPage> {
                                 children: getChoices(context, [
                                   {'label': 'Saavn', 'key': 'saavn'},
                                   {'label': 'YtMusic', 'key': 'ytm'},
-                                  {'label': 'YouTube', 'key': 'yt'},
                                 ]),
                               ),
                       ),

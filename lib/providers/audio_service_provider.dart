@@ -38,7 +38,7 @@ class AudioHandlerHelper {
       builder: () => AudioPlayerHandlerImpl(),
       config: AudioServiceConfig(
         androidNotificationChannelId: 'org.brightdv.blackhole.channel.audio',
-        androidNotificationChannelName: 'BlackHole',
+        androidNotificationChannelName: 'RathijitX',
         androidNotificationIcon: 'drawable/ic_stat_music_note',
         androidShowNotificationBadge: true,
         androidStopForegroundOnPause: false,

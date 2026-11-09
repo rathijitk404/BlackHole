@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                   flexibleSpace: FlexibleSpaceBar(
                     title: RichText(
                       text: TextSpan(
-                        text: AppLocalizations.of(context)!.appTitle,
+                        text: 'RathijitX',
                         style: const TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w600,
@@ -470,21 +470,7 @@ class _HomePageState extends State<HomePage> {
                                   }
                                 },
                               ),
-                              ListTile(
-                                title:
-                                    Text(AppLocalizations.of(context)!.about),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 20.0,
-                                ),
-                                leading: Icon(
-                                  Icons.info_outline_rounded,
-                                  color: Theme.of(context).iconTheme.color,
-                                ),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  Navigator.pushNamed(context, '/about');
-                                },
-                              ),
+                              const SizedBox.shrink(),
                             ],
                           );
                         },
@@ -502,7 +488,7 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.fromLTRB(5, 30, 5, 20),
                           child: Center(
                             child: Text(
-                              AppLocalizations.of(context)!.madeBy,
+                              'Developed with passion created by 𐂂Rathijit',
                               textAlign: TextAlign.center,
                               style: const TextStyle(fontSize: 12),
                             ),
