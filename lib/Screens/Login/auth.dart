@@ -57,7 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Stack(
             children: [
               Positioned(
-                left: MediaQuery.sizeOf(context).width / 1.85,
+                left: 0,
                 child: SizedBox(
                   width: MediaQuery.sizeOf(context).width,
                   height: MediaQuery.sizeOf(context).width,
@@ -118,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               children: [
                                 RichText(
                                   text: TextSpan(
-                                    text: 'Black\nHole\n',
+                                    text: 'RathijitX\n',
                                     style: TextStyle(
                                       height: 0.97,
                                       fontSize: 80,

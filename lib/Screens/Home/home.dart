@@ -1,3 +1,4 @@
+import 'package:blackhole/CustomWidgets/credit_banner.dart';
 import 'package:blackhole/Screens/Library/liked.dart';
 import 'package:blackhole/Screens/Library/playlists.dart';
 /*
@@ -483,18 +484,7 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     children: <Widget>[
                       const Spacer(),
-                      SafeArea(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(5, 30, 5, 20),
-                          child: Center(
-                            child: Text(
-                              'Developed with passion created by 𐂂Rathijit',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          ),
-                        ),
-                      ),
+                      const CreditBanner(),
                     ],
                   ),
                 ),

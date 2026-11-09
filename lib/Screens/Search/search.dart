@@ -690,7 +690,6 @@ class _SearchPageState extends State<SearchPage> {
                             : Row(
                                 children: getChoices(context, [
                                   {'label': 'Saavn', 'key': 'saavn'},
-                                  {'label': 'YtMusic', 'key': 'ytm'},
                                 ]),
                               ),
                       ),
