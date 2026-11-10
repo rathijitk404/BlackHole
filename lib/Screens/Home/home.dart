@@ -287,6 +287,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         drawerEnableOpenDragGesture: false,
         drawer: Drawer(
+width: MediaQuery.sizeOf(context).width,
+shape: const RoundedRectangleBorder(),
+
           child: GradientContainer(
             child: CustomScrollView(
               shrinkWrap: true,
@@ -295,6 +298,14 @@ class _HomePageState extends State<HomePage> {
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
                   automaticallyImplyLeading: false,
+actions: [
+IconButton(
+icon: const Icon(Icons.close_rounded),
+iconSize: 30,
+onPressed: () => Navigator.pop(context),
+),
+const SizedBox(width: 8),
+],
                   elevation: 0,
                   stretch: true,
                   expandedHeight: MediaQuery.sizeOf(context).height * 0.2,

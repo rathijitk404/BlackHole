@@ -1,75 +1,35 @@
 set -e
 python3 -m pip install -q pillow numpy 2>/dev/null || python3 -m pip install -q --break-system-packages pillow numpy 2>/dev/null || true
 python3 - <<'PYEOF'
-import re, os, shutil, subprocess
+import os
 import numpy as np
 from PIL import Image, ImageDraw
 rw = lambda p, f: (lambda s: open(p, 'w', encoding='utf-8').write(s))(f(open(p, encoding='utf-8').read()))
 H = 'lib/Screens/Home/home.dart'
-open('lib/CustomWidgets/search_tab.dart', 'w', encoding='utf-8').write(r'''import 'package:blackhole/Screens/Search/search.dart';
-import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+open('lib/CustomWidgets/credit_banner.dart', 'w', encoding='utf-8').write(r'''import 'package:flutter/material.dart';
 
-class SearchTab extends StatefulWidget {
-const SearchTab({super.key});
-@override
-State<SearchTab> createState() => _SearchTabState();
-}
-
-class _SearchTabState extends State<SearchTab> {
-void _open(String query) {
-Navigator.push(
-context,
-MaterialPageRoute(
-builder: (context) => query.isEmpty
-? const SearchPage(query: '', fromHome: true, autofocus: true)
-: SearchPage(query: query, fromDirectSearch: true),
-),
-).then((_) => setState(() {}));
-}
-
+class CreditBanner extends StatelessWidget {
+const CreditBanner({super.key});
 @override
 Widget build(BuildContext context) {
-final List history = Hive.box('settings').get('search', defaultValue: []) as List;
-final Color accent = Theme.of(context).colorScheme.secondary;
-return Scaffold(
-backgroundColor: Colors.transparent,
-body: SafeArea(
-child: ListView(
-padding: const EdgeInsets.all(16),
+return const SafeArea(
+top: false,
+child: Padding(
+padding: EdgeInsets.fromLTRB(16, 24, 16, 28),
+child: Column(
+mainAxisSize: MainAxisSize.min,
 children: [
-const SizedBox(height: 8),
-InkWell(
-borderRadius: BorderRadius.circular(16),
-onTap: () => _open(''),
-child: Container(
-height: 54,
-padding: const EdgeInsets.symmetric(horizontal: 16),
-decoration: BoxDecoration(
-color: Theme.of(context).cardColor,
-borderRadius: BorderRadius.circular(16),
-),
-child: Row(
-children: [
-Icon(Icons.search_rounded, color: accent),
-const SizedBox(width: 12),
 Text(
-'Search songs, albums, artists',
-style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.bodySmall!.color),
+'DEVELOPED WITH PASSION',
+textAlign: TextAlign.center,
+style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2.2),
 ),
-],
+SizedBox(height: 6),
+Text(
+'Created by \u{10082}Rathijit~',
+textAlign: TextAlign.center,
+style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800),
 ),
-),
-),
-if (history.isNotEmpty) ...[
-const SizedBox(height: 24),
-Text('Recent searches', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: accent)),
-const SizedBox(height: 8),
-Wrap(
-spacing: 8,
-children: history.map((e) => ActionChip(label: Text(e.toString()), onPressed: () => _open(e.toString()))).toList(),
-),
-],
 ],
 ),
 ),
@@ -77,65 +37,29 @@ children: history.map((e) => ActionChip(label: Text(e.toString()), onPressed: ()
 }
 }
 ''')
-I1 = r'''case 'Search':
-return NavigationRailDestination(
-icon: const Icon(Icons.search_rounded),
-label: const Text('Search'),
-);
-'''
-I2 = r'''case 'Search':
-return CustomNavBarScreen(
-routeAndNavigatorSettings: RouteAndNavigatorSettings(
-routes: namedRoutes,
-onGenerateRoute: (RouteSettings settings) {
-if (settings.name == '/player') {
-return PageRouteBuilder(
-opaque: false,
-pageBuilder: (_, __, ___) => const PlayScreen(),
-);
-}
-return HandleRoute.handleRoute(settings.name);
-},
-),
-screen: const SearchTab(),
-);
-'''
-I3 = r'''case 'Search':
-return CustomBottomNavBarItem(
-icon: const Icon(Icons.search_rounded),
-title: const Text('Search'),
-selectedColor: Theme.of(context).colorScheme.secondary,
-);
-'''
-rw(H, lambda s: "import 'package:blackhole/CustomWidgets/search_tab.dart';\n" + (lambda p: p[0] + I1 + "case 'Top Charts':" + p[1] + I2 + "case 'Top Charts':" + p[2] + I3 + "case 'Top Charts':" + p[3])(s.split("case 'Top Charts':")))
-rw(H, lambda s: re.sub(r"Hive\.box\('settings'\)\.get\(\s*'sectionsToShow',\s*defaultValue: \['Home', 'Top Charts', 'YouTube', 'Library'\],\s*\) as List;", "['Home', 'Search', 'Top Charts', 'YouTube'];", s))
-rw('android/app/build.gradle', lambda s: s.replace("    buildTypes {", "    signingConfigs {\n        debug {\n            storeFile = file('rx.p12')\n            storePassword = 'android'\n            keyAlias = 'rx'\n            keyPassword = 'android'\n            storeType = 'pkcs12'\n        }\n    }\n\n    buildTypes {", 1))
-K = 'android/app/rx.p12'
-assert shutil.which('keytool') or os.path.exists(K), 'keytool not found'
-os.path.exists(K) or subprocess.run(['keytool', '-genkeypair', '-storetype', 'PKCS12', '-keystore', K, '-alias', 'rx', '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000', '-storepass', 'android', '-keypass', 'android', '-dname', 'CN=RathijitX, O=RathijitX, C=IN'], check=True, capture_output=True)
-polys = [[(0, 356), (6, 381), (25, 412), (49, 434), (84, 452), (145, 462), (295, 461), (292, 439), (172, 436), (110, 423), (73, 402), (55, 383), (46, 364), (46, 356), (54, 348), (166, 348), (176, 353), (198, 380), (216, 383), (233, 370), (267, 302), (274, 298), (332, 430), (346, 445), (366, 449), (385, 436), (396, 416), (454, 223), (460, 218), (540, 493), (553, 510), (569, 513), (578, 509), (590, 492), (621, 379), (627, 375), (651, 396), (671, 390), (711, 297), (718, 301), (759, 393), (775, 405), (794, 400), (821, 357), (832, 349), (946, 346), (963, 337), (967, 320), (957, 306), (933, 297), (821, 296), (802, 304), (788, 323), (780, 327), (738, 241), (724, 229), (708, 226), (692, 232), (680, 245), (649, 319), (623, 302), (608, 303), (595, 313), (565, 397), (560, 391), (491, 144), (476, 126), (454, 122), (442, 128), (426, 150), (359, 350), (352, 347), (304, 245), (287, 232), (266, 230), (245, 244), (220, 289), (208, 300), (183, 296), (38, 298), (21, 306), (8, 320)], [(68, 259), (71, 267), (101, 266), (116, 240), (136, 219), (180, 196), (230, 191), (273, 201), (311, 136), (345, 102), (375, 81), (445, 53), (518, 48), (581, 64), (633, 98), (671, 147), (690, 202), (735, 191), (788, 196), (830, 219), (847, 237), (864, 269), (901, 267), (897, 244), (883, 215), (848, 179), (823, 165), (793, 156), (734, 157), (702, 97), (655, 50), (596, 17), (520, 0), (480, 0), (430, 8), (359, 36), (317, 65), (287, 94), (243, 162), (186, 159), (134, 176), (90, 213)]]
-chaik = lambda p: [q for i in range(len(p)) for q in ((0.75 * p[i][0] + 0.25 * p[(i + 1) % len(p)][0], 0.75 * p[i][1] + 0.25 * p[(i + 1) % len(p)][1]), (0.25 * p[i][0] + 0.75 * p[(i + 1) % len(p)][0], 0.25 * p[i][1] + 0.75 * p[(i + 1) % len(p)][1]))]
-sm = [chaik(chaik(p)) for p in polys]
-XS = [0.02, 0.23, 0.43, 0.64, 0.85, 0.95]
-RR = [183, 125, 32, 42, 64, 65]
-GG = [40, 51, 92, 160, 210, 218]
-BB = [250, 247, 248, 248, 249, 247]
-mask = lambda wd, h: np.array((lambda m: ([ImageDraw.Draw(m).polygon([(x * wd * 3 / 968, y * h * 3 / 514) for x, y in p], fill=255) for p in sm], m.resize((wd, h), Image.LANCZOS))[1])(Image.new('L', (wd * 3, h * 3), 0))).astype(float) / 255
-rgb = lambda wd, h: np.stack([np.interp(np.arange(wd) / (wd - 1), XS, c) for c in (RR, GG, BB)], -1)[None].repeat(h, 0)
-wave = lambda wd: (lambda h: Image.fromarray(np.dstack([rgb(wd, h), mask(wd, h) * 255]).astype(np.uint8)))(round(wd * 514 / 968))
-onbg = lambda sz, f, bg: (lambda w: (bg.alpha_composite(w, ((sz - w.width) // 2, (sz - w.height) // 2)), bg)[1])(wave(round(f * sz)))
-R = 'android/app/src/main/res/'
+rw(H, lambda s: (lambda p: p[0] + "drawer: Drawer(\nwidth: MediaQuery.sizeOf(context).width,\nshape: const RoundedRectangleBorder(),\n" + p[1].replace("automaticallyImplyLeading: false,", "automaticallyImplyLeading: false,\nactions: [\nIconButton(\nicon: const Icon(Icons.close_rounded),\niconSize: 30,\nonPressed: () => Navigator.pop(context),\n),\nconst SizedBox(width: 8),\n],", 1))(s.split("drawer: Drawer(", 1)))
+pts = [(218, 1), (205, 1), (90, 25), (78, 26), (72, 28), (67, 33), (65, 82), (66, 201), (64, 207), (59, 212), (22, 221), (11, 227), (6, 232), (0, 245), (0, 257), (4, 269), (14, 279), (25, 284), (47, 283), (58, 279), (67, 273), (73, 267), (78, 258), (80, 250), (80, 97), (86, 91), (92, 89), (125, 84), (196, 69), (203, 69), (206, 71), (208, 75), (207, 176), (204, 181), (197, 185), (173, 189), (155, 197), (149, 203), (143, 214), (143, 230), (148, 242), (156, 250), (166, 254), (186, 254), (197, 252), (208, 246), (215, 239), (220, 230), (222, 221), (223, 36), (222, 6)]
+mask = lambda wd, h: np.array((lambda m: ([ImageDraw.Draw(m).polygon([(x * wd * 3 / 224, y * h * 3 / 285) for x, y in pts], fill=255)], m.resize((wd, h), Image.LANCZOS))[1])(Image.new('L', (wd * 3, h * 3), 0))).astype(float) / 255
+note = lambda h: (lambda wd: Image.fromarray(np.dstack([np.full((h, wd, 3), 255.0), mask(wd, h) * 255]).astype(np.uint8)))(round(h * 224 / 285))
+onbg = lambda sz, f, bg: (lambda w: (bg.alpha_composite(w, ((sz - w.width) // 2, (sz - w.height) // 2)), bg)[1])(note(round(f * sz)))
+square = lambda sz: onbg(sz, 0.5, Image.new('RGBA', (sz, sz), (0, 0, 0, 255)))
+circ = lambda sz: (lambda m: (ImageDraw.Draw(m).ellipse((0, 0, sz - 1, sz - 1), fill=255), m)[1])(Image.new('L', (sz, sz), 0))
+rnd = lambda sz: (lambda im: (im.putalpha(circ(sz)), im)[1])(square(sz))
+dens = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
 FG = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
-[onbg(v, 0.6, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'mipmap-' + k + '/ic_launcher_foreground.png') for k, v in FG.items()]
-X = '<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n    <background android:drawable="@color/ic_launcher_background"/>\n    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>\n</adaptive-icon>\n'
-open(R + 'mipmap-anydpi-v26/ic_launcher.xml', 'w').write(X)
-open(R + 'mipmap-anydpi-v26/ic_launcher_round.xml', 'w').write(X)
-os.path.exists(R + 'drawable/ic_launcher_foreground.png') and os.remove(R + 'drawable/ic_launcher_foreground.png')
+R = 'android/app/src/main/res/'
+[square(v).save(R + 'mipmap-' + k + '/ic_launcher.png') for k, v in dens.items()]
+[rnd(v).save(R + 'mipmap-' + k + '/ic_launcher_round.png') for k, v in dens.items()]
+[onbg(v, 0.45, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'mipmap-' + k + '/ic_launcher_foreground.png') for k, v in FG.items()]
+square(512).save('assets/ic_launcher.png')
+bg4 = onbg(400, 0.75, Image.new('RGBA', (400, 400), (0, 0, 0, 0)))
+bg4.putalpha(bg4.getchannel('A').point(lambda v: v // 2))
+bg4.save('assets/icon-white-trans.png')
 t = open(H, encoding='utf-8').read()
-assert t.count("['Home', 'Search', 'Top Charts', 'YouTube'];") == 2 and t.count("case 'Search':") == 3, 'home.dart edit failed'
-assert "rx.p12" in open('android/app/build.gradle').read() and os.path.exists(K), 'signing edit failed'
+assert t.count("shape: const RoundedRectangleBorder(),") == 1 and t.count("Icons.close_rounded") == 1, 'drawer edit failed'
+assert 'LinearGradient' not in open('lib/CustomWidgets/credit_banner.dart', encoding='utf-8').read(), 'banner edit failed'
 print('ALL EDITS OK')
 PYEOF
 git add -A
-git commit -q -m "Search tab, fixed signing key, adaptive icon fix" && echo COMMITTED
+git commit -q -m "Music note icon, text-only credit, full-screen drawer with close button" && echo COMMITTED
 echo DONE
