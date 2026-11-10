@@ -1,59 +1,17 @@
 set -e
 python3 - <<'PYEOF'
 rw = lambda p, f: (lambda s: open(p, 'w', encoding='utf-8').write(s))(f(open(p, encoding='utf-8').read()))
-M = 'android/app/src/main/AndroidManifest.xml'
-H = 'lib/Screens/Home/home.dart'
-N = 'lib/Screens/Settings/new_settings_page.dart'
-rw(M, lambda s: s.replace('<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />', '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />', 1).replace('android:name="com.ryanheise.audioservice.AudioService"', 'android:name="com.ryanheise.audioservice.AudioService"\n            android:foregroundServiceType="mediaPlayback"', 1))
-rw('lib/main.dart', lambda s: "import 'package:permission_handler/permission_handler.dart';\n" + s.replace("  runApp(MyApp());", "  runApp(MyApp());\n  Future.delayed(const Duration(seconds: 2), () => Permission.notification.request());", 1))
-open('lib/CustomWidgets/credit_banner.dart', 'w', encoding='utf-8').write(r'''import 'package:flutter/material.dart';
-
-class CreditBanner extends StatelessWidget {
-const CreditBanner({super.key, this.bottom = 28});
-final double bottom;
-@override
-Widget build(BuildContext context) {
-final Color c = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-return SafeArea(
-top: false,
-child: Padding(
-padding: EdgeInsets.fromLTRB(16, 24, 16, bottom),
-child: FittedBox(
-fit: BoxFit.scaleDown,
-child: Column(
-mainAxisSize: MainAxisSize.min,
-children: [
-Text(
-'DEVELOPED WITH PASSION',
-textAlign: TextAlign.center,
-style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2.2),
-),
-const SizedBox(height: 6),
-Text(
-'Created by \u{10082}Rathijit~',
-textAlign: TextAlign.center,
-style: TextStyle(color: c, fontSize: 19, fontWeight: FontWeight.w800),
-),
-],
-),
-),
-),
-);
-}
-}
-''')
-rw(H, lambda s: s.replace("width: MediaQuery.sizeOf(context).width,\nshape: const RoundedRectangleBorder(),\n", "width: MediaQuery.sizeOf(context).width * 0.62,\n", 1).replace("const CreditBanner(),", "const CreditBanner(bottom: 72),", 1))
-rw(N, lambda s: "import 'package:blackhole/CustomWidgets/credit_banner.dart';\n" + s.replace("itemCount: settingsList.length + 1,", "itemCount: settingsList.length + 2,", 1).replace("if (index == settingsList.length) return const InstagramTile();", "if (index == settingsList.length) return const InstagramTile();\nif (index == settingsList.length + 1) return const CreditBanner();", 1))
-m = open(M, encoding='utf-8').read()
-d = open('lib/main.dart', encoding='utf-8').read()
-h = open(H, encoding='utf-8').read()
-n = open(N, encoding='utf-8').read()
-assert 'POST_NOTIFICATIONS' in m and 'foregroundServiceType="mediaPlayback"' in m and 'FOREGROUND_SERVICE_MEDIA_PLAYBACK' in m, 'manifest edit failed'
-assert 'Permission.notification.request()' in d and d.count('permission_handler.dart') == 1, 'main edit failed'
-assert 'width * 0.62,' in h and 'RoundedRectangleBorder' not in h and 'CreditBanner(bottom: 72)' in h, 'drawer edit failed'
-assert 'settingsList.length + 2,' in n and 'return const CreditBanner();' in n, 'settings edit failed'
+G = 'android/app/build.gradle'
+A = 'lib/providers/audio_service_provider.dart'
+E = 'lib/Services/ext_storage_provider.dart'
+rw(G, lambda s: s.replace('applicationId = "org.brightdv.blackhole"', 'applicationId = "com.rathijitx.music"', 1))
+rw(A, lambda s: s.replace("'org.brightdv.blackhole.channel.audio'", "'com.rathijitx.music.channel.audio'", 1))
+rw(E, lambda s: s.replace("Android/data/org.brightdv.blackhole/files", "Android/data/com.rathijitx.music/files", 1))
+g = open(G, encoding='utf-8').read()
+assert 'applicationId = "com.rathijitx.music"' in g and 'namespace = "org.brightdv.blackhole"' in g, 'gradle edit failed'
+assert 'com.rathijitx.music.channel.audio' in open(A, encoding='utf-8').read() and 'Android/data/com.rathijitx.music/files' in open(E, encoding='utf-8').read(), 'dart edit failed'
 print('ALL EDITS OK')
 PYEOF
 git add -A
-git commit -q -m "Notification permission, side drawer with credit text, credit in settings" && echo COMMITTED
+git commit -q -m "New package name com.rathijitx.music" && echo COMMITTED
 echo DONE
