@@ -1,3 +1,4 @@
+import 'package:blackhole/CustomWidgets/search_tab.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
@@ -68,10 +69,7 @@ class _HomePageState extends State<HomePage> {
       Hive.box('settings').get('checkUpdate', defaultValue: true) as bool;
   bool autoBackup =
       Hive.box('settings').get('autoBackup', defaultValue: false) as bool;
-  List sectionsToShow = Hive.box('settings').get(
-    'sectionsToShow',
-    defaultValue: ['Home', 'Top Charts', 'YouTube', 'Library'],
-  ) as List;
+  List sectionsToShow = ['Home', 'Search', 'Top Charts', 'YouTube'];
   DateTime? backButtonPressTime;
   final bool useDense = Hive.box('settings').get(
     'useDenseMini',
@@ -79,10 +77,7 @@ class _HomePageState extends State<HomePage> {
   ) as bool;
 
   void callback() {
-    sectionsToShow = Hive.box('settings').get(
-      'sectionsToShow',
-      defaultValue: ['Home', 'Top Charts', 'YouTube', 'Library'],
-    ) as List;
+    sectionsToShow = ['Home', 'Search', 'Top Charts', 'YouTube'];
     onItemTapped(0);
     setState(() {});
   }
@@ -540,7 +535,12 @@ class _HomePageState extends State<HomePage> {
                             icon: const Icon(Icons.home_rounded),
                             label: Text(AppLocalizations.of(context)!.home),
                           );
-                        case 'Top Charts':
+                        case 'Search':
+return NavigationRailDestination(
+icon: const Icon(Icons.search_rounded),
+label: const Text('Search'),
+);
+case 'Top Charts':
                           return NavigationRailDestination(
                             icon: const Icon(Icons.favorite_rounded),
                             label: Text(
@@ -633,7 +633,23 @@ class _HomePageState extends State<HomePage> {
                         ),
                         screen: const HomeScreen(),
                       );
-                    case 'Top Charts':
+                    case 'Search':
+return CustomNavBarScreen(
+routeAndNavigatorSettings: RouteAndNavigatorSettings(
+routes: namedRoutes,
+onGenerateRoute: (RouteSettings settings) {
+if (settings.name == '/player') {
+return PageRouteBuilder(
+opaque: false,
+pageBuilder: (_, __, ___) => const PlayScreen(),
+);
+}
+return HandleRoute.handleRoute(settings.name);
+},
+),
+screen: const SearchTab(),
+);
+case 'Top Charts':
                       return CustomNavBarScreen(
                         routeAndNavigatorSettings: RouteAndNavigatorSettings(
                           routes: namedRoutes,
@@ -716,7 +732,13 @@ class _HomePageState extends State<HomePage> {
             title: Text(AppLocalizations.of(context)!.home),
             selectedColor: Theme.of(context).colorScheme.secondary,
           );
-        case 'Top Charts':
+        case 'Search':
+return CustomBottomNavBarItem(
+icon: const Icon(Icons.search_rounded),
+title: const Text('Search'),
+selectedColor: Theme.of(context).colorScheme.secondary,
+);
+case 'Top Charts':
           return CustomBottomNavBarItem(
             icon: const Icon(Icons.favorite_rounded),
             title: Text(AppLocalizations.of(context)!.favSongs),

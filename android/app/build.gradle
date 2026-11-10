@@ -44,6 +44,16 @@ android {
         versionName = flutterVersionName
     }
 
+    signingConfigs {
+        debug {
+            storeFile = file('rx.p12')
+            storePassword = 'android'
+            keyAlias = 'rx'
+            keyPassword = 'android'
+            storeType = 'pkcs12'
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
