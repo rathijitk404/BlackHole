@@ -287,8 +287,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         drawerEnableOpenDragGesture: false,
         drawer: Drawer(
-width: MediaQuery.sizeOf(context).width,
-shape: const RoundedRectangleBorder(),
+width: MediaQuery.sizeOf(context).width * 0.62,
 
           child: GradientContainer(
             child: CustomScrollView(
@@ -492,7 +491,7 @@ const SizedBox(width: 8),
                   child: Column(
                     children: <Widget>[
                       const Spacer(),
-                      const CreditBanner(),
+                      const CreditBanner(bottom: 72),
                     ],
                   ),
                 ),

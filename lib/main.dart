@@ -1,3 +1,4 @@
+import 'package:permission_handler/permission_handler.dart';
 /*
  *  This file is part of BlackHole (https://github.com/BrightDV/BlackHole).
  * 
@@ -67,6 +68,7 @@ Future<void> main() async {
   }
   await startService();
   runApp(MyApp());
+  Future.delayed(const Duration(seconds: 2), () => Permission.notification.request());
 }
 
 Future<void> setOptimalDisplayMode() async {

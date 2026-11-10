@@ -1,65 +1,59 @@
 set -e
-python3 -m pip install -q pillow numpy 2>/dev/null || python3 -m pip install -q --break-system-packages pillow numpy 2>/dev/null || true
 python3 - <<'PYEOF'
-import os
-import numpy as np
-from PIL import Image, ImageDraw
 rw = lambda p, f: (lambda s: open(p, 'w', encoding='utf-8').write(s))(f(open(p, encoding='utf-8').read()))
+M = 'android/app/src/main/AndroidManifest.xml'
 H = 'lib/Screens/Home/home.dart'
+N = 'lib/Screens/Settings/new_settings_page.dart'
+rw(M, lambda s: s.replace('<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />', '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />', 1).replace('android:name="com.ryanheise.audioservice.AudioService"', 'android:name="com.ryanheise.audioservice.AudioService"\n            android:foregroundServiceType="mediaPlayback"', 1))
+rw('lib/main.dart', lambda s: "import 'package:permission_handler/permission_handler.dart';\n" + s.replace("  runApp(MyApp());", "  runApp(MyApp());\n  Future.delayed(const Duration(seconds: 2), () => Permission.notification.request());", 1))
 open('lib/CustomWidgets/credit_banner.dart', 'w', encoding='utf-8').write(r'''import 'package:flutter/material.dart';
 
 class CreditBanner extends StatelessWidget {
-const CreditBanner({super.key});
+const CreditBanner({super.key, this.bottom = 28});
+final double bottom;
 @override
 Widget build(BuildContext context) {
-return const SafeArea(
+final Color c = Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+return SafeArea(
 top: false,
 child: Padding(
-padding: EdgeInsets.fromLTRB(16, 24, 16, 28),
+padding: EdgeInsets.fromLTRB(16, 24, 16, bottom),
+child: FittedBox(
+fit: BoxFit.scaleDown,
 child: Column(
 mainAxisSize: MainAxisSize.min,
 children: [
 Text(
 'DEVELOPED WITH PASSION',
 textAlign: TextAlign.center,
-style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2.2),
+style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2.2),
 ),
-SizedBox(height: 6),
+const SizedBox(height: 6),
 Text(
 'Created by \u{10082}Rathijit~',
 textAlign: TextAlign.center,
-style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800),
+style: TextStyle(color: c, fontSize: 19, fontWeight: FontWeight.w800),
 ),
 ],
+),
 ),
 ),
 );
 }
 }
 ''')
-rw(H, lambda s: (lambda p: p[0] + "drawer: Drawer(\nwidth: MediaQuery.sizeOf(context).width,\nshape: const RoundedRectangleBorder(),\n" + p[1].replace("automaticallyImplyLeading: false,", "automaticallyImplyLeading: false,\nactions: [\nIconButton(\nicon: const Icon(Icons.close_rounded),\niconSize: 30,\nonPressed: () => Navigator.pop(context),\n),\nconst SizedBox(width: 8),\n],", 1))(s.split("drawer: Drawer(", 1)))
-pts = [(218, 1), (205, 1), (90, 25), (78, 26), (72, 28), (67, 33), (65, 82), (66, 201), (64, 207), (59, 212), (22, 221), (11, 227), (6, 232), (0, 245), (0, 257), (4, 269), (14, 279), (25, 284), (47, 283), (58, 279), (67, 273), (73, 267), (78, 258), (80, 250), (80, 97), (86, 91), (92, 89), (125, 84), (196, 69), (203, 69), (206, 71), (208, 75), (207, 176), (204, 181), (197, 185), (173, 189), (155, 197), (149, 203), (143, 214), (143, 230), (148, 242), (156, 250), (166, 254), (186, 254), (197, 252), (208, 246), (215, 239), (220, 230), (222, 221), (223, 36), (222, 6)]
-mask = lambda wd, h: np.array((lambda m: ([ImageDraw.Draw(m).polygon([(x * wd * 3 / 224, y * h * 3 / 285) for x, y in pts], fill=255)], m.resize((wd, h), Image.LANCZOS))[1])(Image.new('L', (wd * 3, h * 3), 0))).astype(float) / 255
-note = lambda h: (lambda wd: Image.fromarray(np.dstack([np.full((h, wd, 3), 255.0), mask(wd, h) * 255]).astype(np.uint8)))(round(h * 224 / 285))
-onbg = lambda sz, f, bg: (lambda w: (bg.alpha_composite(w, ((sz - w.width) // 2, (sz - w.height) // 2)), bg)[1])(note(round(f * sz)))
-square = lambda sz: onbg(sz, 0.5, Image.new('RGBA', (sz, sz), (0, 0, 0, 255)))
-circ = lambda sz: (lambda m: (ImageDraw.Draw(m).ellipse((0, 0, sz - 1, sz - 1), fill=255), m)[1])(Image.new('L', (sz, sz), 0))
-rnd = lambda sz: (lambda im: (im.putalpha(circ(sz)), im)[1])(square(sz))
-dens = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
-FG = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
-R = 'android/app/src/main/res/'
-[square(v).save(R + 'mipmap-' + k + '/ic_launcher.png') for k, v in dens.items()]
-[rnd(v).save(R + 'mipmap-' + k + '/ic_launcher_round.png') for k, v in dens.items()]
-[onbg(v, 0.45, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'mipmap-' + k + '/ic_launcher_foreground.png') for k, v in FG.items()]
-square(512).save('assets/ic_launcher.png')
-bg4 = onbg(400, 0.75, Image.new('RGBA', (400, 400), (0, 0, 0, 0)))
-bg4.putalpha(bg4.getchannel('A').point(lambda v: v // 2))
-bg4.save('assets/icon-white-trans.png')
-t = open(H, encoding='utf-8').read()
-assert t.count("shape: const RoundedRectangleBorder(),") == 1 and t.count("Icons.close_rounded") == 1, 'drawer edit failed'
-assert 'LinearGradient' not in open('lib/CustomWidgets/credit_banner.dart', encoding='utf-8').read(), 'banner edit failed'
+rw(H, lambda s: s.replace("width: MediaQuery.sizeOf(context).width,\nshape: const RoundedRectangleBorder(),\n", "width: MediaQuery.sizeOf(context).width * 0.62,\n", 1).replace("const CreditBanner(),", "const CreditBanner(bottom: 72),", 1))
+rw(N, lambda s: "import 'package:blackhole/CustomWidgets/credit_banner.dart';\n" + s.replace("itemCount: settingsList.length + 1,", "itemCount: settingsList.length + 2,", 1).replace("if (index == settingsList.length) return const InstagramTile();", "if (index == settingsList.length) return const InstagramTile();\nif (index == settingsList.length + 1) return const CreditBanner();", 1))
+m = open(M, encoding='utf-8').read()
+d = open('lib/main.dart', encoding='utf-8').read()
+h = open(H, encoding='utf-8').read()
+n = open(N, encoding='utf-8').read()
+assert 'POST_NOTIFICATIONS' in m and 'foregroundServiceType="mediaPlayback"' in m and 'FOREGROUND_SERVICE_MEDIA_PLAYBACK' in m, 'manifest edit failed'
+assert 'Permission.notification.request()' in d and d.count('permission_handler.dart') == 1, 'main edit failed'
+assert 'width * 0.62,' in h and 'RoundedRectangleBorder' not in h and 'CreditBanner(bottom: 72)' in h, 'drawer edit failed'
+assert 'settingsList.length + 2,' in n and 'return const CreditBanner();' in n, 'settings edit failed'
 print('ALL EDITS OK')
 PYEOF
 git add -A
-git commit -q -m "Music note icon, text-only credit, full-screen drawer with close button" && echo COMMITTED
+git commit -q -m "Notification permission, side drawer with credit text, credit in settings" && echo COMMITTED
 echo DONE

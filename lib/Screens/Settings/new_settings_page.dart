@@ -1,3 +1,4 @@
+import 'package:blackhole/CustomWidgets/credit_banner.dart';
 import 'package:blackhole/CustomWidgets/instagram_tile.dart';
 /*
  *  This file is part of BlackHole (https://github.com/BrightDV/BlackHole).
@@ -301,9 +302,10 @@ class _NewSettingsPageState extends State<NewSettingsPage>
             vertical: 15.0,
           ),
           physics: const BouncingScrollPhysics(),
-          itemCount: settingsList.length + 1,
+          itemCount: settingsList.length + 2,
           itemBuilder: (context, index) {
 if (index == settingsList.length) return const InstagramTile();
+if (index == settingsList.length + 1) return const CreditBanner();
             return ListTile(
               leading: SizedBox.square(
                 dimension: 40,
