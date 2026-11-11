@@ -1,7 +1,7 @@
 set -e
 python3 -m pip install -q pillow numpy 2>/dev/null || python3 -m pip install -q --break-system-packages pillow numpy 2>/dev/null || true
 python3 - <<'PYEOF'
-import re
+import os, re
 import numpy as np
 from PIL import Image, ImageDraw
 rw = lambda p, f: (lambda s: open(p, 'w', encoding='utf-8').write(s))(f(open(p, encoding='utf-8').read()))
@@ -11,34 +11,36 @@ S = 'lib/Screens/Search/search.dart'
 rw(X, lambda s: s.replace("if (await requestPermission(Permission.storage)) {", "if (await Permission.manageExternalStorage.isGranted || await requestPermission(Permission.storage)) {", 1).replace("return throw 'something went wrong';", "return (await getExternalStorageDirectory())!.path;", 1))
 rw(D, lambda s: s.replace("if (Platform.isAndroid || Platform.isIOS) {", "if (Platform.isIOS) {", 1))
 rw(S, lambda s: re.sub(r"top: 70,", "top: 118,", re.sub(r"\{'label': 'Saavn', 'key': 'saavn'\},", "", s, count=1), count=1))
-SOLID = [[(54, 12), (155, 0), (155, 40), (54, 49)], [(54, 12), (62, 12), (62, 137), (54, 137)], [(147, 0), (155, 0), (155, 110), (147, 110)]]
-RINGS = [(31, 137, 31, 28), (124, 110, 31, 28)]
-INNER = [(31, 137, 23, 20), (124, 110, 23, 20)]
-HOLE = [(62, 18), (147, 10), (147, 31), (62, 38)]
-def mask(wd, h): K = 8; m = Image.new('L', (wd * K, h * K), 0); d = ImageDraw.Draw(m); sx = wd * K / 156; sy = h * K / 166; [d.polygon([(x * sx, y * sy) for x, y in P], fill=255) for P in SOLID]; [d.ellipse([(cx - rx) * sx, (cy - ry) * sy, (cx + rx) * sx, (cy + ry) * sy], fill=255) for cx, cy, rx, ry in RINGS]; [d.ellipse([(cx - rx) * sx, (cy - ry) * sy, (cx + rx) * sx, (cy + ry) * sy], fill=0) for cx, cy, rx, ry in INNER]; d.polygon([(x * sx, y * sy) for x, y in HOLE], fill=0); return np.array(m.resize((wd, h), Image.LANCZOS))
-note = lambda h: (lambda wd: Image.fromarray(np.dstack([np.full((h, wd, 3), 255, dtype=np.uint8), mask(wd, h)])))(round(h * 156 / 166))
-onbg = lambda sz, f, bg: (lambda w: (bg.alpha_composite(w, ((sz - w.width) // 2, (sz - w.height) // 2)), bg)[1])(note(round(f * sz)))
-square = lambda sz: onbg(sz, 0.46, Image.new('RGBA', (sz, sz), (0, 0, 0, 255)))
+POLYS = [[(13, 76), (5, 90), (0, 112), (2, 721), (4, 733), (12, 752), (16, 758), (32, 773), (53, 782), (76, 783), (94, 778), (112, 767), (463, 433), (570, 522), (597, 541), (612, 545), (629, 545), (638, 543), (652, 536), (666, 522), (674, 506), (676, 484), (675, 477), (668, 460), (656, 446), (474, 297), (284, 148), (263, 136), (249, 133), (239, 133), (226, 136), (214, 142), (198, 159), (191, 178), (191, 196), (196, 211), (210, 229), (355, 342), (374, 359), (128, 589), (126, 103), (122, 90), (114, 76), (98, 61), (86, 55), (75, 52), (60, 51), (44, 54), (29, 61)], [(209, 12), (206, 19), (205, 29), (209, 41), (217, 50), (309, 116), (414, 195), (532, 287), (650, 383), (661, 389), (673, 390), (682, 387), (690, 380), (694, 372), (695, 363), (693, 355), (686, 344), (563, 243), (452, 156), (249, 4), (239, 0), (226, 0), (217, 4)]]
+def mask(wd, h): K = 8; m = Image.new('L', (wd * K, h * K), 0); d = ImageDraw.Draw(m); sx = wd * K / 696; sy = h * K / 784; [d.polygon([(x * sx, y * sy) for x, y in P], fill=255) for P in POLYS]; return np.array(m.resize((wd, h), Image.LANCZOS))
+glyph = lambda h: (lambda wd: Image.fromarray(np.dstack([np.full((h, wd, 3), 255, dtype=np.uint8), mask(wd, h)])))(round(h * 696 / 784))
+onbg = lambda sz, f, bg: (lambda w: (bg.alpha_composite(w, ((sz - w.width) // 2, (sz - w.height) // 2)), bg)[1])(glyph(round(f * sz)))
+square = lambda sz: onbg(sz, 0.55, Image.new('RGBA', (sz, sz), (0, 0, 0, 255)))
 circ = lambda sz: (lambda m: (ImageDraw.Draw(m).ellipse((0, 0, sz - 1, sz - 1), fill=255), m)[1])(Image.new('L', (sz, sz), 0))
 rnd = lambda sz: (lambda im: (im.putalpha(circ(sz)), im)[1])(square(sz))
 dens = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
 FG = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+ST = {'mdpi': 24, 'hdpi': 36, 'xhdpi': 48, 'xxhdpi': 72, 'xxxhdpi': 96}
 R = 'android/app/src/main/res/'
 [square(v).save(R + 'mipmap-' + k + '/ic_launcher.png') for k, v in dens.items()]
 [rnd(v).save(R + 'mipmap-' + k + '/ic_launcher_round.png') for k, v in dens.items()]
-[onbg(v, 0.4, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'mipmap-' + k + '/ic_launcher_foreground.png') for k, v in FG.items()]
+[onbg(v, 0.44, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'mipmap-' + k + '/ic_launcher_foreground.png') for k, v in FG.items()]
+[onbg(v, 0.8, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'drawable-' + k + '/ic_stat_music_note.png') for k, v in ST.items()]
 square(1024).save('assets/ic_launcher.png')
 bg4 = onbg(800, 0.7, Image.new('RGBA', (800, 800), (0, 0, 0, 0)))
 bg4.putalpha(bg4.getchannel('A').point(lambda v: v // 2))
 bg4.save('assets/icon-white-trans.png')
+os.makedirs(R + 'raw', exist_ok=True)
+open(R + 'raw/keep.xml', 'w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources xmlns:tools="http://schemas.android.com/tools"\n    tools:shrinkMode="lax"\n    tools:keep="@drawable/ic_stat_music_note,@mipmap/ic_launcher*" />\n')
 x = open(X, encoding='utf-8').read()
 d = open(D, encoding='utf-8').read()
 s = open(S, encoding='utf-8').read()
 assert 'manageExternalStorage.isGranted ||' in x and 'getExternalStorageDirectory())!.path;' in x, 'storage edit failed'
 assert d.count('if (Platform.isIOS) {') >= 1 and 'Permission.storage.status' in d, 'download edit failed'
 assert "'label': 'Saavn'" not in s and 'top: 118,' in s, 'search edit failed'
+assert os.path.exists(R + 'raw/keep.xml') and os.path.exists(R + 'drawable-hdpi/ic_stat_music_note.png'), 'icon edit failed'
 print('ALL EDITS OK')
 PYEOF
 git add -A
-git commit -q -m "Fix downloads, hide source chip, smaller crisp icon" && echo COMMITTED
+git commit -q -m "New logo icon, fix notification icon, downloads, hide source chip" && echo COMMITTED
 echo DONE
