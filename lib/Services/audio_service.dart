@@ -279,6 +279,7 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
 
     _player!.loopModeStream
         .listen((event) => _broadcastState(_player!.playbackEvent));
+    _player!.playingStream.listen((_) => _broadcastState(_player!.playbackEvent));
 
     _player!.processingStateStream.listen((state) {
       if (state == ProcessingState.completed) {
@@ -1083,7 +1084,10 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
           if (!Platform.isIOS) MediaControl.stop,
         ],
         systemActions: const {
-          MediaAction.seek,
+MediaAction.play,
+MediaAction.pause,
+MediaAction.playPause,
+MediaAction.seek,
           MediaAction.seekForward,
           MediaAction.seekBackward,
         },
