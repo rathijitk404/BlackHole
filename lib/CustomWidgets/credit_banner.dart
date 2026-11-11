@@ -18,13 +18,13 @@ children: [
 Text(
 'DEVELOPED WITH PASSION',
 textAlign: TextAlign.center,
-style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2.2),
+style: TextStyle(color: c, fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1.8),
 ),
 const SizedBox(height: 6),
 Text(
 'Created by \u{10082}Rathijit~',
 textAlign: TextAlign.center,
-style: TextStyle(color: c, fontSize: 19, fontWeight: FontWeight.w800),
+style: TextStyle(color: c, fontSize: 15, fontWeight: FontWeight.w800),
 ),
 ],
 ),

@@ -1,17 +1,91 @@
 set -e
+python3 -m pip install -q pillow numpy 2>/dev/null || python3 -m pip install -q --break-system-packages pillow numpy 2>/dev/null || true
 python3 - <<'PYEOF'
+import os
+import numpy as np
+from PIL import Image, ImageDraw
 rw = lambda p, f: (lambda s: open(p, 'w', encoding='utf-8').write(s))(f(open(p, encoding='utf-8').read()))
-G = 'android/app/build.gradle'
-A = 'lib/providers/audio_service_provider.dart'
-E = 'lib/Services/ext_storage_provider.dart'
-rw(G, lambda s: s.replace('applicationId = "org.brightdv.blackhole"', 'applicationId = "com.rathijitx.music"', 1))
-rw(A, lambda s: s.replace("'org.brightdv.blackhole.channel.audio'", "'com.rathijitx.music.channel.audio'", 1))
-rw(E, lambda s: s.replace("Android/data/org.brightdv.blackhole/files", "Android/data/com.rathijitx.music/files", 1))
-g = open(G, encoding='utf-8').read()
-assert 'applicationId = "com.rathijitx.music"' in g and 'namespace = "org.brightdv.blackhole"' in g, 'gradle edit failed'
-assert 'com.rathijitx.music.channel.audio' in open(A, encoding='utf-8').read() and 'Android/data/com.rathijitx.music/files' in open(E, encoding='utf-8').read(), 'dart edit failed'
+M = 'android/app/src/main/AndroidManifest.xml'
+H = 'lib/Screens/Home/home.dart'
+PERM = r'''
+Future<void> requestStartupPermissions() async {
+final List<Permission> asks = [
+Permission.notification,
+Permission.audio,
+Permission.photos,
+Permission.videos,
+Permission.bluetoothConnect,
+Permission.storage,
+];
+for (final Permission p in asks) {
+try {
+if (!await p.isGranted) {
+await p.request();
+}
+} catch (_) {}
+}
+final Box settings = Hive.box('settings');
+if (!(settings.get('allFilesAsked', defaultValue: false) as bool)) {
+await settings.put('allFilesAsked', true);
+try {
+await Permission.manageExternalStorage.request();
+} catch (_) {}
+}
+}
+'''
+rw(M, lambda s: s.replace('<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />', '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />\n    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />', 1))
+rw('lib/main.dart', lambda s: s.replace("Future.delayed(const Duration(seconds: 2), () => Permission.notification.request());", "Future.delayed(const Duration(seconds: 2), requestStartupPermissions);", 1) + PERM)
+open('lib/CustomWidgets/favorites_tab.dart', 'w', encoding='utf-8').write(r'''import 'package:blackhole/Screens/Library/liked.dart';
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+class FavoritesTab extends StatelessWidget {
+const FavoritesTab({super.key, required this.title});
+final String title;
+@override
+Widget build(BuildContext context) {
+return ValueListenableBuilder<Box>(
+valueListenable: Hive.box('Favorite Songs').listenable(),
+builder: (BuildContext context, Box box, Widget? child) {
+return LikedSongs(
+key: ValueKey<int>(Object.hashAll(box.keys)),
+playlistName: 'Favorite Songs',
+showName: title,
+);
+},
+);
+}
+}
+''')
+rw(H, lambda s: "import 'package:blackhole/CustomWidgets/favorites_tab.dart';\n" + s.replace("screen: LikedSongs(playlistName: 'Favorite Songs', showName: AppLocalizations.of(context)!.favSongs),", "screen: FavoritesTab(title: AppLocalizations.of(context)!.favSongs),", 1))
+rw('lib/CustomWidgets/credit_banner.dart', lambda s: s.replace("fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 2.2", "fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1.8", 1).replace("fontSize: 19, fontWeight: FontWeight.w800", "fontSize: 15, fontWeight: FontWeight.w800", 1))
+outer = [(151, 0), (132, 1), (131, 2), (123, 2), (113, 4), (98, 4), (97, 5), (81, 6), (80, 7), (66, 7), (56, 9), (54, 11), (53, 15), (54, 19), (54, 113), (51, 115), (40, 109), (22, 109), (12, 114), (2, 125), (0, 133), (0, 141), (2, 145), (2, 148), (9, 157), (13, 160), (25, 165), (36, 165), (49, 160), (56, 154), (60, 148), (62, 141), (62, 120), (63, 119), (62, 117), (62, 49), (64, 47), (146, 40), (147, 41), (147, 88), (145, 89), (140, 85), (132, 82), (117, 82), (109, 85), (102, 90), (96, 97), (96, 100), (94, 102), (93, 106), (93, 113), (94, 118), (99, 127), (109, 135), (114, 136), (117, 138), (132, 138), (135, 136), (140, 135), (150, 126), (155, 117), (155, 2)]
+holes = [[(15, 122), (24, 117), (38, 117), (44, 120), (53, 129), (54, 134), (53, 144), (42, 155), (34, 157), (28, 157), (20, 155), (12, 148), (8, 139), (9, 130)], [(111, 93), (119, 90), (130, 90), (140, 95), (144, 99), (147, 105), (147, 115), (144, 121), (137, 127), (129, 130), (119, 130), (109, 125), (104, 120), (104, 118), (102, 116), (101, 107), (104, 100)], [(147, 10), (147, 30), (143, 32), (125, 33), (124, 34), (110, 34), (102, 36), (77, 37), (69, 39), (65, 39), (62, 36), (62, 18), (64, 16), (79, 15), (80, 14), (95, 14), (102, 12), (127, 11), (136, 9), (146, 9)]]
+mask = lambda wd, h: np.array((lambda m: ([ImageDraw.Draw(m).polygon([(x * wd * 3 / 156, y * h * 3 / 166) for x, y in outer], fill=255)] + [ImageDraw.Draw(m).polygon([(x * wd * 3 / 156, y * h * 3 / 166) for x, y in hp], fill=0) for hp in holes], m.resize((wd, h), Image.LANCZOS))[1])(Image.new('L', (wd * 3, h * 3), 0))).astype(float) / 255
+note = lambda h: (lambda wd: Image.fromarray(np.dstack([np.full((h, wd, 3), 255.0), mask(wd, h) * 255]).astype(np.uint8)))(round(h * 156 / 166))
+onbg = lambda sz, f, bg: (lambda w: (bg.alpha_composite(w, ((sz - w.width) // 2, (sz - w.height) // 2)), bg)[1])(note(round(f * sz)))
+square = lambda sz: onbg(sz, 0.58, Image.new('RGBA', (sz, sz), (0, 0, 0, 255)))
+circ = lambda sz: (lambda m: (ImageDraw.Draw(m).ellipse((0, 0, sz - 1, sz - 1), fill=255), m)[1])(Image.new('L', (sz, sz), 0))
+rnd = lambda sz: (lambda im: (im.putalpha(circ(sz)), im)[1])(square(sz))
+dens = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+FG = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+R = 'android/app/src/main/res/'
+[square(v).save(R + 'mipmap-' + k + '/ic_launcher.png') for k, v in dens.items()]
+[rnd(v).save(R + 'mipmap-' + k + '/ic_launcher_round.png') for k, v in dens.items()]
+[onbg(v, 0.5, Image.new('RGBA', (v, v), (0, 0, 0, 0))).save(R + 'mipmap-' + k + '/ic_launcher_foreground.png') for k, v in FG.items()]
+square(512).save('assets/ic_launcher.png')
+bg4 = onbg(400, 0.75, Image.new('RGBA', (400, 400), (0, 0, 0, 0)))
+bg4.putalpha(bg4.getchannel('A').point(lambda v: v // 2))
+bg4.save('assets/icon-white-trans.png')
+m = open(M, encoding='utf-8').read()
+d = open('lib/main.dart', encoding='utf-8').read()
+h = open(H, encoding='utf-8').read()
+assert 'READ_MEDIA_AUDIO' in m and 'BLUETOOTH_CONNECT' in m and 'READ_MEDIA_VIDEO' in m, 'manifest edit failed'
+assert 'requestStartupPermissions);' in d and 'Future<void> requestStartupPermissions()' in d, 'main edit failed'
+assert 'FavoritesTab(title:' in h and 'favorites_tab.dart' in h, 'favorites edit failed'
+assert 'fontSize: 15' in open('lib/CustomWidgets/credit_banner.dart', encoding='utf-8').read(), 'banner edit failed'
 print('ALL EDITS OK')
 PYEOF
 git add -A
-git commit -q -m "New package name com.rathijitx.music" && echo COMMITTED
+git commit -q -m "Outline note icon, startup permissions, favorites tab refresh, smaller credit text" && echo COMMITTED
 echo DONE

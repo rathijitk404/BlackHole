@@ -1,3 +1,4 @@
+import 'package:blackhole/CustomWidgets/favorites_tab.dart';
 import 'package:blackhole/CustomWidgets/search_tab.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
@@ -673,7 +674,7 @@ case 'Top Charts':
                             return HandleRoute.handleRoute(settings.name);
                           },
                         ),
-                        screen: LikedSongs(playlistName: 'Favorite Songs', showName: AppLocalizations.of(context)!.favSongs),
+                        screen: FavoritesTab(title: AppLocalizations.of(context)!.favSongs),
                       );
                     case 'YouTube':
                       return CustomNavBarScreen(

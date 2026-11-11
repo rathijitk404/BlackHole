@@ -68,7 +68,7 @@ Future<void> main() async {
   }
   await startService();
   runApp(MyApp());
-  Future.delayed(const Duration(seconds: 2), () => Permission.notification.request());
+  Future.delayed(const Duration(seconds: 2), requestStartupPermissions);
 }
 
 Future<void> setOptimalDisplayMode() async {
@@ -339,4 +339,29 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+Future<void> requestStartupPermissions() async {
+final List<Permission> asks = [
+Permission.notification,
+Permission.audio,
+Permission.photos,
+Permission.videos,
+Permission.bluetoothConnect,
+Permission.storage,
+];
+for (final Permission p in asks) {
+try {
+if (!await p.isGranted) {
+await p.request();
+}
+} catch (_) {}
+}
+final Box settings = Hive.box('settings');
+if (!(settings.get('allFilesAsked', defaultValue: false) as bool)) {
+await settings.put('allFilesAsked', true);
+try {
+await Permission.manageExternalStorage.request();
+} catch (_) {}
+}
 }
