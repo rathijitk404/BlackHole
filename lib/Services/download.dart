@@ -81,7 +81,7 @@ class Download with ChangeNotifier {
   }) async {
     Logger.root.info('Preparing download for ${data['title']}');
     download = true;
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isIOS) {
       Logger.root.info('Requesting storage permission');
       PermissionStatus status = await Permission.storage.status;
       if (status.isDenied) {

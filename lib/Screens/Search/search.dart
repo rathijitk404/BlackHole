@@ -682,14 +682,14 @@ class _SearchPageState extends State<SearchPage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
-                          top: 70,
+                          top: 118,
                           left: 15,
                         ),
                         child: (query.isEmpty && widget.query.isEmpty)
                             ? null
                             : Row(
                                 children: getChoices(context, [
-                                  {'label': 'Saavn', 'key': 'saavn'},
+                                  
                                 ]),
                               ),
                       ),

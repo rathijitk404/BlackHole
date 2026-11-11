@@ -47,7 +47,7 @@ class ExtStorageProvider {
     try {
       // checking platform
       if (Platform.isAndroid) {
-        if (await requestPermission(Permission.storage)) {
+        if (await Permission.manageExternalStorage.isGranted || await requestPermission(Permission.storage)) {
           directory = await getExternalStorageDirectory();
 
           // getting main path
@@ -78,7 +78,7 @@ class ExtStorageProvider {
             }
           }
         } else {
-          return throw 'something went wrong';
+          return (await getExternalStorageDirectory())!.path;
         }
       } else if (Platform.isIOS || Platform.isMacOS) {
         directory = await getApplicationDocumentsDirectory();
