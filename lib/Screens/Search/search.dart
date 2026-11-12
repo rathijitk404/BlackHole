@@ -75,7 +75,7 @@ class _SearchPageState extends State<SearchPage> {
   bool? fromHome;
   List<Map<dynamic, dynamic>> searchedList = [];
   String searchType =
-      Hive.box('settings').get('searchType', defaultValue: 'saavn').toString();
+      'saavn';
   List searchHistory =
       Hive.box('settings').get('search', defaultValue: []) as List;
   // bool showHistory =
@@ -688,11 +688,7 @@ class _SearchPageState extends State<SearchPage> {
                         child: (query.isEmpty && widget.query.isEmpty)
                             ? null
                             : Row(
-                                children: getChoices(context, [
-{'label': 'Music', 'key': 'saavn'},
-{'label': 'YT Music', 'key': 'ytm'},
-{'label': 'YouTube', 'key': 'yt'},
-]),
+                                children: getChoices(context, []),
                               ),
                       ),
                       Expanded(

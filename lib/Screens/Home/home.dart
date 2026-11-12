@@ -1,4 +1,4 @@
-import 'package:blackhole/CustomWidgets/favorites_tab.dart';
+import 'package:blackhole/Screens/Library/downloads.dart';
 import 'package:blackhole/CustomWidgets/search_tab.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
 import 'package:blackhole/CustomWidgets/credit_banner.dart';
@@ -432,15 +432,6 @@ const SizedBox(width: 8),
                                 },
                               ),
                               ListTile(
-title: const Text('YouTube'),
-contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-leading: Icon(Icons.smart_display_rounded, color: Theme.of(context).iconTheme.color),
-onTap: () {
-Navigator.pop(context);
-Navigator.push(context, MaterialPageRoute(builder: (context) => const YouTube()));
-},
-),
-ListTile(
 title: const Text('Spotify'),
 contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
 leading: Icon(Icons.library_music_rounded, color: Theme.of(context).iconTheme.color),
@@ -571,9 +562,9 @@ label: const Text('Search'),
 );
 case 'Top Charts':
                           return NavigationRailDestination(
-                            icon: const Icon(Icons.favorite_rounded),
+                            icon: const Icon(Icons.download_done_rounded),
                             label: Text(
-                              AppLocalizations.of(context)!.favSongs,
+                              AppLocalizations.of(context)!.downs,
                             ),
                           );
                         case 'YouTube':
@@ -692,7 +683,7 @@ case 'Top Charts':
                             return HandleRoute.handleRoute(settings.name);
                           },
                         ),
-                        screen: FavoritesTab(title: AppLocalizations.of(context)!.favSongs),
+                        screen: const Downloads(),
                       );
                     case 'YouTube':
                       return CustomNavBarScreen(
@@ -769,8 +760,8 @@ selectedColor: Theme.of(context).colorScheme.secondary,
 );
 case 'Top Charts':
           return CustomBottomNavBarItem(
-            icon: const Icon(Icons.favorite_rounded),
-            title: Text(AppLocalizations.of(context)!.favSongs),
+            icon: const Icon(Icons.download_done_rounded),
+            title: Text(AppLocalizations.of(context)!.downs),
             selectedColor: Theme.of(context).colorScheme.secondary,
           );
         case 'YouTube':
