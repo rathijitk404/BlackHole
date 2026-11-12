@@ -22,6 +22,7 @@ import 'package:blackhole/CustomWidgets/instagram_tile.dart';
 import 'package:blackhole/CustomWidgets/drawer.dart';
 import 'package:blackhole/CustomWidgets/gradient_containers.dart';
 import 'package:blackhole/Screens/Settings/about.dart';
+import 'package:blackhole/Screens/Settings/rathijit_about.dart';
 import 'package:blackhole/Screens/Settings/app_ui.dart';
 import 'package:blackhole/Screens/Settings/backup_and_restore.dart';
 import 'package:blackhole/Screens/Settings/download.dart';
@@ -280,6 +281,13 @@ class _NewSettingsPageState extends State<NewSettingsPage>
           AppLocalizations.of(context)!.autoBack,
           AppLocalizations.of(context)!.autoBackLocation,
         ],
+      },
+      {
+        'title': 'About',
+        'icon': Icons.info_outline_rounded,
+        'onTap': const RathijitAboutPage(),
+        'isThreeLine': false,
+        'items': ['Rathijit', 'GitHub', 'Telegram', 'Instagram'],
       },
       
     ];
