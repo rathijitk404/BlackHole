@@ -689,8 +689,10 @@ class _SearchPageState extends State<SearchPage> {
                             ? null
                             : Row(
                                 children: getChoices(context, [
-                                  
-                                ]),
+{'label': 'Music', 'key': 'saavn'},
+{'label': 'YT Music', 'key': 'ytm'},
+{'label': 'YouTube', 'key': 'yt'},
+]),
                               ),
                       ),
                       Expanded(

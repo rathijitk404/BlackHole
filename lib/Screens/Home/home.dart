@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
         ) as String;
         if (autoBackPath == '') {
           ExtStorageProvider.getExtStorage(
-            dirName: 'BlackHole/Backups',
+            dirName: 'RathijitX/Backups',
             writeAccess: true,
           ).then((value) {
             Hive.box('settings').put('autoBackPath', value);
@@ -215,7 +215,7 @@ class _HomePageState extends State<HomePage> {
               checked,
               boxNames,
               path: value,
-              fileName: 'BlackHole_AutoBackup',
+              fileName: 'RathijitX_AutoBackup',
               showDialog: false,
             );
           });
@@ -225,14 +225,14 @@ class _HomePageState extends State<HomePage> {
             checked,
             boxNames,
             path: autoBackPath,
-            fileName: 'BlackHole_AutoBackup',
+            fileName: 'RathijitX_AutoBackup',
             showDialog: false,
           ).then(
             (value) => {
               if (value.contains('No such file or directory'))
                 {
                   ExtStorageProvider.getExtStorage(
-                    dirName: 'BlackHole/Backups',
+                    dirName: 'RathijitX/Backups',
                     writeAccess: true,
                   ).then(
                     (value) {
@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                         checked,
                         boxNames,
                         path: value,
-                        fileName: 'BlackHole_AutoBackup',
+                        fileName: 'RathijitX_AutoBackup',
                       );
                     },
                   ),
@@ -432,6 +432,24 @@ const SizedBox(width: 8),
                                 },
                               ),
                               ListTile(
+title: const Text('YouTube'),
+contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+leading: Icon(Icons.smart_display_rounded, color: Theme.of(context).iconTheme.color),
+onTap: () {
+Navigator.pop(context);
+Navigator.push(context, MaterialPageRoute(builder: (context) => const YouTube()));
+},
+),
+ListTile(
+title: const Text('Spotify'),
+contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+leading: Icon(Icons.library_music_rounded, color: Theme.of(context).iconTheme.color),
+onTap: () {
+Navigator.pop(context);
+Navigator.push(context, MaterialPageRoute(builder: (context) => TopCharts(pageController: PageController())));
+},
+),
+ListTile(
                                 title: Text(
                                   AppLocalizations.of(context)!.playlists,
                                 ),

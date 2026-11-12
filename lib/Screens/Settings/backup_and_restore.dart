@@ -41,7 +41,7 @@ class _BackupAndRestorePageState extends State<BackupAndRestorePage> {
   final MyTheme currentTheme = GetIt.I<MyTheme>();
   String autoBackPath = Hive.box('settings').get(
     'autoBackPath',
-    defaultValue: '/storage/emulated/0/BlackHole/Backups',
+    defaultValue: '/storage/emulated/0/RathijitX/Backups',
   ) as String;
 
   @override
@@ -330,10 +330,10 @@ class _BackupAndRestorePageState extends State<BackupAndRestorePage> {
                 ),
                 onPressed: () async {
                   autoBackPath = await ExtStorageProvider.getExtStorage(
-                        dirName: 'BlackHole/Backups',
+                        dirName: 'RathijitX/Backups',
                         writeAccess: true,
                       ) ??
-                      '/storage/emulated/0/BlackHole/Backups';
+                      '/storage/emulated/0/RathijitX/Backups';
                   Hive.box('settings').put('autoBackPath', autoBackPath);
                   setState(
                     () {},
