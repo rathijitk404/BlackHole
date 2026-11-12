@@ -372,6 +372,7 @@ class YouTubeServices {
     String expireAt = '0';
     if (getUrl) {
       urlsData = await getYtStreamUrls(video.id.value);
+      if (urlsData.isEmpty) return null;
       final Map finalUrlData =
           quality == 'High' ? urlsData.last : urlsData.first;
       finalUrl = finalUrlData['url'].toString();

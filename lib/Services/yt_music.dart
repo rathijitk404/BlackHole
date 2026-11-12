@@ -568,6 +568,7 @@ class YtMusicService {
       String expireAt = '0';
       if (getUrl) {
         urlsData = await YouTubeServices.instance.getYtStreamUrls(videoId);
+        if (urlsData.isEmpty) throw 'no stream urls';
         if (urlsData.isNotEmpty) {
           final Map finalUrlData =
               quality == 'High' ? urlsData.last : urlsData.first;
@@ -607,7 +608,7 @@ class YtMusicService {
       };
     } catch (e) {
       Logger.root.severe('Error in yt get song data', e);
-      return {};
+      return await YouTubeServices.instance.formatVideoFromId(id: videoId, data: data, getUrl: getUrl) ?? {};
     }
   }
 

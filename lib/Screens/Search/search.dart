@@ -1108,9 +1108,8 @@ class _SearchPageState extends State<SearchPage> {
                                                                           as Map,
                                                                     );
 
-                                                              if (response !=
-                                                                  null) {
-                                                                PlayerInvoke
+                                                              if (response != null && response.isNotEmpty && (response['url'] ?? '').toString().isNotEmpty) {
+PlayerInvoke
                                                                     .init(
                                                                   songsList: [
                                                                     response,
